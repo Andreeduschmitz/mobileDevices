@@ -6,25 +6,18 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
-    Socket socket;
+public class Client extends Socket {
     Scanner scanner;
     PrintStream clientOut;
 
     public Client(String serverIp, int serverPort) throws IOException {
-        this.socket = new Socket(serverIp, serverPort);;
+        super(serverIp, serverPort);
         this.scanner = new Scanner(System.in);
-        this.clientOut = new PrintStream(socket.getOutputStream());
-    }
-
-    public Client(Socket socket, String serverIp, int serverPort) throws IOException {
-        this.socket = socket;
-        this.scanner = new Scanner(System.in);
-        this.clientOut = new PrintStream(socket.getOutputStream());
+        this.clientOut = new PrintStream(super.getOutputStream());
     }
 
     public InputStream getMessage() throws IOException {
-        return socket.getInputStream();
+        return super.getInputStream();
     }
 
     public boolean isOnline() {
@@ -36,17 +29,9 @@ public class Client {
     }
 
     public void close() throws IOException {
-        socket.close();
+        super.close();
         scanner.close();
         clientOut.close();
-    }
-
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
     }
 
     public PrintStream getClientOut() {

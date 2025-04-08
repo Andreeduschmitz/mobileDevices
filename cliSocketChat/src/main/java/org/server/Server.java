@@ -6,16 +6,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Server {
-    ServerSocket serverSocket;
-
+public class Server extends ServerSocket {
     public Server(int port) throws IOException {
-        this.serverSocket = new ServerSocket(port);
+        super(port);
         System.out.println("Servidor iniciado na porta: " + port);
     }
 
     public Socket waitForConnection() throws IOException {
-        return serverSocket.accept();
+        return super.accept();
     }
 
     public boolean connectionEstablished(Socket client) throws IOException {
@@ -35,6 +33,6 @@ public class Server {
     }
 
     public void closeServer () throws IOException {
-        this.serverSocket.close();
+        super.close();
     }
 }
