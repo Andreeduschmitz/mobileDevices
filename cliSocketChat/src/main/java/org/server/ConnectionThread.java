@@ -4,6 +4,7 @@ import org.enums.CommandEnum;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class ConnectionThread extends Thread {
     Server server;
@@ -32,44 +33,61 @@ public class ConnectionThread extends Thread {
             while (continueReading) {
                 String clientMessage = reader.readLine();
                 String[] messageParts = clientMessage.split(" ");
-                CommandEnum command = CommandEnum.valueOf(messageParts[0]);
+                CommandEnum command = CommandEnum.getValue(messageParts[0]);
 
                 switch (command) {
                     case USERS:
                         this.listClients();
+                        break;
                     case SEND_MESSAGE:
                         this.sendMessage(messageParts);
+                        break;
                     case SEND_FILE:
                         this.sendFile(messageParts);
+                        break;
                     case OUT:
                         continueReading = false;
                         this.finishConnection();
+                        break;
                 }
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao ler mensagem do cliente: " + e.getMessage());
+            System.out.println("Erro no cliente.");
+            this.finishConnection();
         }
     }
 
     private void listClients() {
-        String usersList = String.join("/n", this.server.getConnections());
-        writer.println("Usuários conectados:/n " + usersList);
+        if (this.server.getClients().size() == 1) {
+            this.writer.println("Nenhum cliente conectado.");
+            return;
+        }
+
+        this.writer.println("Clientes conectados:");
+
+        for(String client : this.server.getClients()) {
+            if (!this.clientName.equals(client)) {
+                this.writer.println(client);
+            }
+        }
     }
 
     private void sendMessage(String[] messageParts) {
         String receiverName = messageParts[1];
-        String message = messageParts[2];
+        String message = String.join(" ", Arrays.copyOfRange(messageParts, 2, messageParts.length));
 
-        if (this.server.getConnections().contains(receiverName)) {
+        if (!this.server.getClients().contains(receiverName)) {
             this.writer.println("Cliente " + receiverName + " não está conectado.");
+            this.listClients();
             return;
         }
 
         ConnectionThread connectionThread = this.server.getConnectionThread(receiverName);
-        connectionThread.getWriter().println(message);
+        connectionThread.getWriter().println("[" + clientName + "]: " + message);
     }
 
+    //TODO implementar envio de arquivos
     private void sendFile(String[] messageParts) {
 
     }
@@ -80,5 +98,9 @@ public class ConnectionThread extends Thread {
 
     public PrintWriter getWriter() {
         return writer;
+    }
+
+    public Socket getSocket() {
+        return this.socket;
     }
 }

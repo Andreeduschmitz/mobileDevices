@@ -6,16 +6,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class WriteThread extends Thread {
     private Socket socket;
-    private Client client;
     private PrintWriter writer;
 
-    public WriteThread(Socket socket, Client cliente) {
+    public WriteThread(Socket socket) {
         this.socket = socket;
-        this.client = cliente;
 
         try {
             OutputStream output = socket.getOutputStream();
@@ -30,7 +29,6 @@ public class WriteThread extends Thread {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Digite seu nome de usuário: ");
         String clientName = scanner.nextLine();
-        this.client.setClientName(clientName);
         this.writer.println(clientName);
 
         while (scanner.hasNextLine()) {
@@ -40,9 +38,9 @@ public class WriteThread extends Thread {
             CommandEnum command = null;
 
             try {
-                command = CommandEnum.valueOf(messageParts[0]);
+                command = CommandEnum.getValue(messageParts[0]);
             } catch (IllegalArgumentException e) {
-                System.out.println("Comando inválido. (/users - /message - /file - /out)");
+                System.out.println("Comando inválido. Os comandos válidos são: " + String.join(" - ", Arrays.toString(CommandEnum.values())));
             }
 
             this.writer.println(message);
@@ -52,6 +50,7 @@ public class WriteThread extends Thread {
 
         try {
             this.socket.close();
+            this.writer.close();
         } catch (IOException e) {
             System.out.println("Erro ao fechar a conexão: " + e.getMessage());
         }

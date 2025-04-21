@@ -21,4 +21,9 @@ public enum CommandEnum {
 
         throw new IllegalArgumentException("Modo de operação não existente.");
     }
+
+    @Override
+    public String toString() {
+        return this.command;
+    }
 }

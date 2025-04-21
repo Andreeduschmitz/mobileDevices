@@ -8,10 +8,10 @@ import java.net.Socket;
 
 public class ReadThread extends Thread {
     private BufferedReader reader;
-    private Client client;
+    private Socket socket;
 
-    public ReadThread(Socket socket, Client client) {
-        this.client = client;
+    public ReadThread(Socket socket) {
+        this.socket = socket;
 
         try {
             InputStream input = socket.getInputStream();
@@ -25,10 +25,26 @@ public class ReadThread extends Thread {
         while (true) {
             try {
                 String response = this.reader.readLine();
-                System.out.println("\n" + response);
-            } catch (IOException e) {
-                System.out.println("Erro ao ler a mensagem: " + e.getMessage());
+
+                if (response == null) {
+                    this.close();
+                }
+
+                System.out.println(response);
+            } catch (Exception e) {
+                System.out.println("Conexão fechada.");
+                this.close();
+                break;
             }
+        }
+    }
+
+    private void close() {
+        try {
+            this.reader.close();
+            this.socket.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
