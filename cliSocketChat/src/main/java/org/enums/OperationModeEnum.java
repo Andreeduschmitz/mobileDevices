@@ -1,12 +1,12 @@
-package org.operation;
+package org.enums;
 
 public enum OperationModeEnum {
     CLIENT("cliente"),
-    SERVER("servidor"),;
+    SERVER("servidor");
 
     private String mode;
 
-    OperationModeEnum(String mode) {
+    private OperationModeEnum(String mode) {
         this.mode = mode;
     }
 

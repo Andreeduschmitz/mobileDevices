@@ -1,38 +1,54 @@
 package org.server;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
+import java.util.*;
 
-public class Server extends ServerSocket {
+public class Server {
+    private ServerSocket serverSocket;
+    private Map<String, ConnectionThread> clients = new HashMap<>();
+
     public Server(int port) throws IOException {
-        super(port);
+        serverSocket = new ServerSocket(port);
         System.out.println("Servidor iniciado na porta: " + port);
     }
 
     public Socket waitForConnection() throws IOException {
-        return super.accept();
+        return this.serverSocket.accept();
     }
 
-    public boolean connectionEstablished(Socket client) throws IOException {
-        Scanner clientIn = new Scanner(client.getInputStream());
-        return clientIn.hasNextLine();
+    public void execute() {
+        try {
+            while (true) {
+                Socket client = this.waitForConnection();
+                System.out.println("Conexão estabelecida com cliente de ip: " + client.getInetAddress().getHostAddress());
+
+                ConnectionThread connectionThread = new ConnectionThread(client, this);
+                connectionThread.start();
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao tentar conectar com um cliente: " + e.getMessage());
+        }
     }
 
-    public String getMessage(Socket client) throws IOException {
-        Scanner clientIn = new Scanner(client.getInputStream());
-        return clientIn.nextLine();
+    public Set<String> getConnections() {
+        return this.clients.keySet();
     }
 
-    public void sendMessage(Socket client, String message) throws IOException {
-        PrintStream clientOut = new PrintStream(client.getOutputStream());
-        clientOut.println(message);
-        clientOut.flush();
+    public ConnectionThread getConnectionThread(String clientName) {
+        return this.clients.get(clientName);
     }
 
-    public void closeServer () throws IOException {
-        super.close();
+    public void addClient(String clientName, ConnectionThread connectionThread) {
+        this.clients.put(clientName, connectionThread);
+    }
+
+    public void removeClient(String clientName) {
+        ConnectionThread connectionThread = this.clients.remove(clientName);
+
+        if (connectionThread != null) {
+            System.out.println("Cliente: " + clientName + " realizou logout.");
+        }
     }
 }
