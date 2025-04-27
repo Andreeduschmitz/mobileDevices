@@ -17,8 +17,9 @@ public class Client {
         try {
             Socket socket = new Socket(this.serverIp, this.serverPort);
 
-            new ReadThread(socket).start();
-            new WriteThread(socket).start();
+            WriteThread writeThread = new WriteThread(socket);
+            new ReadThread(socket, writeThread).start();
+            writeThread.start();
         } catch (UnknownHostException e) {
             System.out.println("Servidor não encontrado: " + e.getMessage());
         } catch (Exception e) {

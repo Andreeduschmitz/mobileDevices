@@ -87,7 +87,7 @@ public class ConnectionThread extends Thread {
         connectionThread.getWriter().println("[" + clientName + "]: " + message);
     }
 
-    //TODO implementar envio de arquivos
+    //TODO implementar o recebimento do arquivo do rementente e envio para o destinatário
     private void sendFile(String[] messageParts) {
 
     }

@@ -19,7 +19,7 @@ public enum CommandEnum {
             }
         }
 
-        throw new IllegalArgumentException("Modo de operação não existente.");
+        throw new IllegalArgumentException("Comando não existente.");
     }
 
     @Override

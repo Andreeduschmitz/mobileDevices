@@ -2,24 +2,20 @@ package org.client;
 
 import org.enums.CommandEnum;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class WriteThread extends Thread {
-    private Socket socket;
     private PrintWriter writer;
+    private OutputStream output;
+    private volatile boolean stop = false;
 
     public WriteThread(Socket socket) {
-        this.socket = socket;
-
         try {
-            OutputStream output = socket.getOutputStream();
-            this.writer = new PrintWriter(output, true);
-
+            this.output = socket.getOutputStream();
+            this.writer = new PrintWriter(this.output, true);
         } catch (IOException e) {
             System.out.println("Erro na conexão: " + e.getMessage());
         }
@@ -31,10 +27,9 @@ public class WriteThread extends Thread {
         String clientName = scanner.nextLine();
         this.writer.println(clientName);
 
-        while (scanner.hasNextLine()) {
+        while (!this.stop && scanner.hasNextLine()) {
             String message = scanner.nextLine();
             String[] messageParts = message.split(" ");
-
             CommandEnum command = null;
 
             try {
@@ -43,16 +38,24 @@ public class WriteThread extends Thread {
                 System.out.println("Comando inválido. Os comandos válidos são: " + String.join(" - ", Arrays.toString(CommandEnum.values())));
             }
 
-            this.writer.println(message);
+            if (command == CommandEnum.SEND_FILE) {
+                this.sendFile(messageParts[1]);
+            } else {
+                this.writer.println(message);
+            }
 
             if (CommandEnum.OUT.equals(command)) break;
         }
+        System.out.println("Conexão finalizada.");
+    }
 
-        try {
-            this.socket.close();
-            this.writer.close();
-        } catch (IOException e) {
-            System.out.println("Erro ao fechar a conexão: " + e.getMessage());
-        }
+    // TODO implementar a captura do arquivo e o envio do mesmo
+    private void sendFile(String filePath) {
+
+    }
+
+    public void stopWriteThread() {
+        this.stop = true;
+        System.out.println("Conexão finalizada.");
     }
 }

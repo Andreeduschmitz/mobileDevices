@@ -9,9 +9,11 @@ import java.net.Socket;
 public class ReadThread extends Thread {
     private BufferedReader reader;
     private Socket socket;
+    private WriteThread writeThread;
 
-    public ReadThread(Socket socket) {
+    public ReadThread(Socket socket, WriteThread writeThread) {
         this.socket = socket;
+        this.writeThread = writeThread;
 
         try {
             InputStream input = socket.getInputStream();
@@ -28,6 +30,7 @@ public class ReadThread extends Thread {
 
                 if (response == null) {
                     this.close();
+                    break;
                 }
 
                 System.out.println(response);
@@ -39,10 +42,16 @@ public class ReadThread extends Thread {
         }
     }
 
+    // TODO implementar o recebimento do arquivo enviado para o destinatário
+    private void receiveFile() {
+
+    }
+
     private void close() {
         try {
             this.reader.close();
             this.socket.close();
+            this.writeThread.stopWriteThread();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
