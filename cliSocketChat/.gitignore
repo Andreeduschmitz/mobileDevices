@@ -36,3 +36,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+## Temp Files ##
+server_temp_files_directory/
+client_files_directory/
+logs.txt
