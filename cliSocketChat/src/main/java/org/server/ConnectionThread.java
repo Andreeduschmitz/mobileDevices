@@ -36,6 +36,12 @@ public class ConnectionThread extends Thread {
 
             while (continueReading) {
                 String clientMessage = reader.readLine();
+
+                if(StringUtils.isEmpty(clientMessage)) {
+                    this.writer.println("Mensagem mal formada. Tente -> <comando> <destinatário> <conteudo>");
+                    break;
+                }
+
                 String[] messageParts = clientMessage.split(" ");
                 CommandEnum command;
 
@@ -56,26 +62,32 @@ public class ConnectionThread extends Thread {
                         break;
 
                     case SEND_FILE:
-                        System.out.println("Servidor recebendo o comando de sendFile");
-
                         if (messageParts.length < 3) {
-                            this.writer.println("Comando mal formado. Tente -> <comando> <destinatário> <conteudo>");
+                            this.writer.println("Comando de envio de arquivos mal formado. Tente -> <comando> <destinatário> <conteudo>");
                             break;
                         }
 
                         String receiverName = messageParts[1];
-                        System.out.println("receiverName no servidor: " + receiverName);
-                        String fileName = this.receiveFile(Server.SERVER_TEMP_FILES_DIRECTORY);
-                        this.sendMessage(new String[]{"", receiverName, CommandEnum.SEND_FILE.toString()});
-                        System.out.println("Servidor irá enviar o arquivo: " + Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName);
+                        String fileName = messageParts[2];
+                        this.receiveFile(Server.SERVER_TEMP_FILES_DIRECTORY, fileName);
+                        Thread.sleep(100);
+
+                        ConnectionThread connectionThread = this.getReceiverConnectionThread(receiverName);
+                        if (connectionThread == null) {
+                            break;
+                        }
+
+                        // Envia o comando para o destinatário se preparar para o recebimento do arquivo
+                        String message = CommandEnum.SEND_FILE + " " + this.clientName + " " + fileName;
+                        connectionThread.getWriter().println(message);
+                        Thread.sleep(100);
+
                         this.sendFile(Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName, receiverName);
+                        Thread.sleep(100);
 
-                        if (fileName != null) {
-                            File file = new File(Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName);
-
-                            if (file.exists() && file.isFile()) {
-                                file.delete();
-                            }
+                        File file = new File(Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName);
+                        if (file.exists() && file.isFile()) {
+                            file.delete();
                         }
 
                         break;
@@ -119,10 +131,9 @@ public class ConnectionThread extends Thread {
         connectionThread.getWriter().println("[" + clientName + "]: " + message);
     }
 
-    private String receiveFile(String filePath) {
-        String fileName = null;
+    private String receiveFile(String filePath, String fileName) throws IOException {
         try {
-            fileName = FileHandler.receiveFile(this.inputStream, filePath);
+            FileHandler.receiveFile(this.inputStream, filePath, fileName);
         } catch (IOException e) {
             System.out.println("Erro ao receber o arquivo do cliente: " + e.getMessage());
             return null;
@@ -134,17 +145,14 @@ public class ConnectionThread extends Thread {
     private void sendFile(String filePath, String receiverName) {
         ConnectionThread connectionThread = this.getReceiverConnectionThread(receiverName);
 
-        if (StringUtils.isBlank(filePath) || StringUtils.isBlank(receiverName)) {
-            this.writer.println("Comando mal formado. Tente -> <comando> <destinatário> <conteudo>");
+        if (connectionThread == null) {
             return;
         }
 
-        if (connectionThread != null) {
-            try {
-                FileHandler.sendFile(connectionThread.outputStream, filePath);
-            } catch (IOException e) {
-                System.out.println("Erro ao enviar o arquivo para o cliente: " + e.getMessage());
-            }
+        try {
+            FileHandler.sendFile(connectionThread.outputStream, filePath);
+        } catch (IOException e) {
+            System.out.println("Erro ao enviar o arquivo para o cliente: " + e.getMessage());
         }
     }
 

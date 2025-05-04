@@ -47,7 +47,6 @@ public class WriteThread extends Thread {
             }
 
             if (command == CommandEnum.SEND_FILE) {
-                System.out.println("Writer recebeu o comando de envio e irá entrar no sendFile");
                 this.sendFile(messageParts[2], messageParts[1]);
             } else {
                 this.writer.println(message);
@@ -58,22 +57,25 @@ public class WriteThread extends Thread {
     }
 
     private void sendFile(String filePath, String clientName) {
-        this.writer.println(CommandEnum.SEND_FILE + " " + clientName + " " + filePath);
-        System.out.println("Writer enviando para o servidor o comando:" + CommandEnum.SEND_FILE + " " + clientName + " " + filePath);
-        Boolean sendSuccess = null;
+        File file = new File(filePath);
+
+        if (!file.exists() || !file.isFile()) {
+            System.out.println("O arquivo " + filePath + " não existe ou não é um arquivo válido.");
+            return;
+        }
+
+        // Envia o comando para o servidor se preparar para o recebimento do arquivo
+        this.writer.println(CommandEnum.SEND_FILE + " " + clientName + " " + file.getName());
 
         try {
-            sendSuccess = FileHandler.sendFile(output, filePath);
-        } catch (IOException e) {
+            Thread.sleep(100);
+            FileHandler.sendFile(output, filePath);
+        } catch (Exception e) {
             System.out.println("Erro ao enviar o arquivo: " + e.getMessage());
-            sendSuccess = false;
+            return;
         }
 
-        if (sendSuccess) {
-            System.out.println("Arquivo enviado com sucesso.");
-        } else {
-            // this.writer.println(CommandEnum.CANCEL_SEND_FILE + " " + clientName);
-        }
+        System.out.println("Arquivo enviado com sucesso.");
     }
 
     public void stopWriteThread() {

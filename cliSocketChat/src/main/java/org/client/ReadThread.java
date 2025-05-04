@@ -5,7 +5,6 @@ import org.handlers.FileHandler;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class ReadThread extends Thread {
     private BufferedReader reader;
@@ -30,15 +29,14 @@ public class ReadThread extends Thread {
             try {
                 String response = this.reader.readLine();
 
-                if (response == null) {
+                 if (response == null) {
                     this.close();
                     break;
                 }
 
-                if (response.endsWith(CommandEnum.SEND_FILE.toString())) {
-                    System.out.println("Cliente recebeu o comando de receber o arquivo.");
+                if (response.startsWith(CommandEnum.SEND_FILE.toString())) {
                     String[] messageParts = response.split(" ");
-                    this.receiveFile(messageParts[0]);
+                    this.receiveFile(messageParts[1], messageParts[2]);
                     continue;
                 }
 
@@ -51,19 +49,15 @@ public class ReadThread extends Thread {
         }
     }
 
-    private void receiveFile(String senderName) {
-        String fileName = null;
-
+    private void receiveFile(String senderName, String fileName) {
         try {
-            fileName = FileHandler.receiveFile(this.inputStream, Client.clientFilesDirectory);
+            FileHandler.receiveFile(this.inputStream, Client.CLIENT_FILES_DIRECTORY, fileName);
         } catch (IOException e) {
-            System.out.println("Erro ao receber um arquivo de " + senderName + ": " + e.getMessage());
-            return;
+            System.out.println("Erro ao receber um arquivo de " + senderName + " " + e.getMessage());
+            throw new RuntimeException(e);
         }
 
-        if (fileName != null) {
-            System.out.println( senderName + "(enviou o arquivo " + fileName + ")");
-        }
+        System.out.println("["+ senderName + "] " + "Enviou o arquivo " + fileName);
     }
 
     private void close() {

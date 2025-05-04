@@ -45,7 +45,7 @@ public class Main {
         switch (operationModeEnum) {
             case CLIENT:
                 System.out.println("Insira o ip do servidor:");
-                String serverIp = "";
+                String serverIp = null;
                 boolean validServerIp = false;
 
                 while (!validServerIp) {
