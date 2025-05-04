@@ -34,7 +34,7 @@ public class WriteThread extends Thread {
             String[] messageParts = message.split(" ");
             CommandEnum command = null;
 
-            if (StringUtils.isBlank(message) || messageParts.length < 3) {
+            if (StringUtils.isBlank(message)) {
                 System.out.println("Comando mal formado. Tente -> <comando> <destinatário> <conteudo>");
                 continue;
             }
@@ -54,7 +54,6 @@ public class WriteThread extends Thread {
 
             if (CommandEnum.OUT.equals(command)) break;
         }
-        System.out.println("Conexão finalizada.");
     }
 
     private void sendFile(String filePath, String clientName) {

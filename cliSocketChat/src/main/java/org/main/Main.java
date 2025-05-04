@@ -6,11 +6,12 @@ import org.server.Server;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Scanner in = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
 
         boolean validOperaitonMode = false;
         OperationModeEnum operationModeEnum = null;
@@ -19,7 +20,7 @@ public class Main {
         while (!validOperaitonMode) {
             try {
                 System.out.println("Qual modo você deseja operar? " + String.join(" - ", Arrays.toString(OperationModeEnum.values())));
-                operationModeString = in.nextLine();
+                operationModeString = input.nextLine();
                 operationModeEnum = OperationModeEnum.getValue(operationModeString);
                 validOperaitonMode = true;
             } catch (IllegalArgumentException e) {
@@ -28,12 +29,34 @@ public class Main {
         }
 
         System.out.println("Insira a porta do servidor:");
-        int port = 12345;
+        int port = 0;
+        boolean validPort = false;
+
+        while (!validPort) {
+            try {
+                port = input.nextInt();
+                validPort = true;
+            } catch (InputMismatchException e) {
+                System.out.println("Porta inválida. Digite uma porta válida:");
+                input.nextLine();
+            }
+        }
 
         switch (operationModeEnum) {
             case CLIENT:
                 System.out.println("Insira o ip do servidor:");
-                String serverIp = "192.168.0.26";
+                String serverIp = "";
+                boolean validServerIp = false;
+
+                while (!validServerIp) {
+                    try {
+                        serverIp = input.next();
+                        validServerIp = true;
+                    } catch (InputMismatchException e) {
+                        System.out.println("Ip inválido. Digite um ip válido:");
+                    }
+                }
+
                 new Client(serverIp, port).execute();
                 break;
             case SERVER:

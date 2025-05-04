@@ -51,14 +51,16 @@ public class ReadThread extends Thread {
     }
 
     private void receiveFile(String senderName) {
+        String fileName = null;
+
         try {
-            FileHandler.receiveFile(this.inputStream, Client.clientFilesDirectory);
+            fileName = FileHandler.receiveFile(this.inputStream, Client.clientFilesDirectory);
         } catch (IOException e) {
             System.out.println("Erro ao receber um arquivo de " + senderName + ": " + e.getMessage());
             return;
         }
 
-        System.out.println( senderName + "(enviou um arquivo)");
+        System.out.println( senderName + "(enviou o arquivo" + fileName != null ? " " + fileName : ""  + ")");
     }
 
     private void close() {

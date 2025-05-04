@@ -34,7 +34,7 @@ public class FileHandler {
         return true;
     }
 
-    public static void receiveFile(InputStream inputStream, String filePath) throws IOException {
+    public static String receiveFile(InputStream inputStream, String filePath) throws IOException {
         DataInputStream dataInputStream = new DataInputStream(inputStream);
 
         String marker = dataInputStream.readUTF();
@@ -62,5 +62,7 @@ public class FileHandler {
                 totalBytesRead += bytesRead;
             }
         }
+
+        return fileName;
     }
 }
