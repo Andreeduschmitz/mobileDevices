@@ -60,7 +60,9 @@ public class ReadThread extends Thread {
             return;
         }
 
-        System.out.println( senderName + "(enviou o arquivo" + (fileName != null ? " " + fileName : "")  + ")");
+        if (fileName == null) {
+            System.out.println( senderName + "(enviou o arquivo " + fileName + ")");
+        }
     }
 
     private void close() {
