@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 public class Client {
     private String serverIp;
     private int serverPort;
+    public static String clientFilesDirectory = "client_files_directory";
 
     public Client(String serverIp, int serverPort) {
         this.serverIp = serverIp;

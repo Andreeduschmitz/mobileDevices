@@ -1,23 +1,25 @@
 package org.client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.enums.CommandEnum;
+import org.handlers.FileHandler;
+
+import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class ReadThread extends Thread {
     private BufferedReader reader;
     private Socket socket;
     private WriteThread writeThread;
+    private InputStream inputStream;
 
     public ReadThread(Socket socket, WriteThread writeThread) {
         this.socket = socket;
         this.writeThread = writeThread;
 
         try {
-            InputStream input = socket.getInputStream();
-            this.reader = new BufferedReader(new InputStreamReader(input));
+            this.inputStream = socket.getInputStream();
+            this.reader = new BufferedReader(new InputStreamReader(this.inputStream));
         } catch (Exception e) {
             System.out.println("Erro ao realizar leitura: " + e.getMessage());
         }
@@ -33,6 +35,12 @@ public class ReadThread extends Thread {
                     break;
                 }
 
+                if (response.endsWith(CommandEnum.SEND_FILE.toString())) {
+                    String[] messageParts = response.split(" ");
+                    this.receiveFile(messageParts[0]);
+                    continue;
+                }
+
                 System.out.println(response);
             } catch (Exception e) {
                 System.out.println("Conexão fechada.");
@@ -42,9 +50,15 @@ public class ReadThread extends Thread {
         }
     }
 
-    // TODO implementar o recebimento do arquivo enviado para o destinatário
-    private void receiveFile() {
+    private void receiveFile(String senderName) {
+        try {
+            FileHandler.receiveFile(this.inputStream, Client.clientFilesDirectory);
+        } catch (IOException e) {
+            System.out.println("Erro ao receber um arquivo de " + senderName + ": " + e.getMessage());
+            return;
+        }
 
+        System.out.println( senderName + "(enviou um arquivo)");
     }
 
     private void close() {

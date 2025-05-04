@@ -1,6 +1,8 @@
 package org.client;
 
+import org.apache.commons.lang3.StringUtils;
 import org.enums.CommandEnum;
+import org.handlers.FileHandler;
 
 import java.io.*;
 import java.net.Socket;
@@ -32,14 +34,20 @@ public class WriteThread extends Thread {
             String[] messageParts = message.split(" ");
             CommandEnum command = null;
 
+            if (StringUtils.isBlank(message) || messageParts.length < 3) {
+                System.out.println("Comando mal formado. Tente -> <comando> <destinatário> <conteudo>");
+                continue;
+            }
+
             try {
                 command = CommandEnum.getValue(messageParts[0]);
             } catch (IllegalArgumentException e) {
                 System.out.println("Comando inválido. Os comandos válidos são: " + String.join(" - ", Arrays.toString(CommandEnum.values())));
+                continue;
             }
 
             if (command == CommandEnum.SEND_FILE) {
-                this.sendFile(messageParts[1]);
+                this.sendFile(messageParts[2], messageParts[1]);
             } else {
                 this.writer.println(message);
             }
@@ -49,9 +57,22 @@ public class WriteThread extends Thread {
         System.out.println("Conexão finalizada.");
     }
 
-    // TODO implementar a captura do arquivo e o envio do mesmo
-    private void sendFile(String filePath) {
+    private void sendFile(String filePath, String clientName) {
+        this.writer.println(CommandEnum.SEND_FILE + " " + clientName + " " + filePath);
+        Boolean sendSuccess = null;
 
+        try {
+            sendSuccess = FileHandler.sendFile(output, filePath);
+        } catch (IOException e) {
+            System.out.println("Erro ao enviar o arquivo: " + e.getMessage());
+            sendSuccess = false;
+        }
+
+        if (sendSuccess) {
+            System.out.println("Arquivo enviado com sucesso.");
+        } else {
+            // this.writer.println(CommandEnum.CANCEL_SEND_FILE + " " + clientName);
+        }
     }
 
     public void stopWriteThread() {

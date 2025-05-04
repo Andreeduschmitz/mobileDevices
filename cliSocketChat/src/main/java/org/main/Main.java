@@ -28,12 +28,12 @@ public class Main {
         }
 
         System.out.println("Insira a porta do servidor:");
-        int port = in.nextInt();
+        int port = 12345;
 
         switch (operationModeEnum) {
             case CLIENT:
                 System.out.println("Insira o ip do servidor:");
-                String serverIp = in.next();
+                String serverIp = "192.168.0.26";
                 new Client(serverIp, port).execute();
                 break;
             case SERVER:

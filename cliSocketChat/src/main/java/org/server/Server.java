@@ -12,6 +12,7 @@ import java.util.*;
 public class Server {
     private ServerSocket serverSocket;
     private final Map<String, ConnectionThread> clients = new HashMap<>();
+    public static String serverFilesDirectory = "server_files_directory";
 
     public Server(int port) throws IOException {
         serverSocket = new ServerSocket(port);

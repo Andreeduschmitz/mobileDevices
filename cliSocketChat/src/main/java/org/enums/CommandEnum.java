@@ -4,7 +4,7 @@ public enum CommandEnum {
     USERS("/users"),
     SEND_MESSAGE("/message"),
     SEND_FILE("/file"),
-    OUT("/out");
+    OUT("/sair");
 
     private String command;
 
