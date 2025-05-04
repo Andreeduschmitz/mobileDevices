@@ -30,6 +30,7 @@ public class FileHandler {
         }
 
         dataOutputStream.flush();
+        dataOutputStream.close();
         fileInputStream.close();
         return true;
     }
@@ -63,6 +64,7 @@ public class FileHandler {
             }
         }
 
+        dataInputStream.close();
         return fileName;
     }
 }
