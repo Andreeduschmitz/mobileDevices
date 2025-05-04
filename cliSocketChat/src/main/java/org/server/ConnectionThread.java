@@ -56,14 +56,18 @@ public class ConnectionThread extends Thread {
                         break;
 
                     case SEND_FILE:
+                        System.out.println("Servidor recebendo o comando de sendFile");
+
                         if (messageParts.length < 3) {
                             this.writer.println("Comando mal formado. Tente -> <comando> <destinatário> <conteudo>");
                             break;
                         }
 
                         String receiverName = messageParts[1];
+                        System.out.println("receiverName no servidor: " + receiverName);
                         String fileName = this.receiveFile(Server.SERVER_TEMP_FILES_DIRECTORY);
                         this.sendMessage(new String[]{"", receiverName, CommandEnum.SEND_FILE.toString()});
+                        System.out.println("Servidor irá enviar o arquivo: " + Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName);
                         this.sendFile(Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName, receiverName);
 
                         if (fileName != null) {

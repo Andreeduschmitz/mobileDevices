@@ -36,6 +36,7 @@ public class ReadThread extends Thread {
                 }
 
                 if (response.endsWith(CommandEnum.SEND_FILE.toString())) {
+                    System.out.println("Cliente recebeu o comando de receber o arquivo.");
                     String[] messageParts = response.split(" ");
                     this.receiveFile(messageParts[0]);
                     continue;

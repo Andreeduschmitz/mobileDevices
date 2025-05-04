@@ -47,6 +47,7 @@ public class WriteThread extends Thread {
             }
 
             if (command == CommandEnum.SEND_FILE) {
+                System.out.println("Writer recebeu o comando de envio e irá entrar no sendFile");
                 this.sendFile(messageParts[2], messageParts[1]);
             } else {
                 this.writer.println(message);
@@ -58,6 +59,7 @@ public class WriteThread extends Thread {
 
     private void sendFile(String filePath, String clientName) {
         this.writer.println(CommandEnum.SEND_FILE + " " + clientName + " " + filePath);
+        System.out.println("Writer enviando para o servidor o comando:" + CommandEnum.SEND_FILE + " " + clientName + " " + filePath);
         Boolean sendSuccess = null;
 
         try {
