@@ -70,7 +70,6 @@ public class ConnectionThread extends Thread {
                         String receiverName = messageParts[1];
                         String fileName = messageParts[2];
                         this.receiveFile(Server.SERVER_TEMP_FILES_DIRECTORY, fileName);
-                        Thread.sleep(100);
 
                         ConnectionThread connectionThread = this.getReceiverConnectionThread(receiverName);
                         if (connectionThread == null) {
@@ -80,10 +79,8 @@ public class ConnectionThread extends Thread {
                         // Envia o comando para o destinatário se preparar para o recebimento do arquivo
                         String message = CommandEnum.SEND_FILE + " " + this.clientName + " " + fileName;
                         connectionThread.getWriter().println(message);
-                        Thread.sleep(100);
 
                         this.sendFile(Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName, receiverName);
-                        Thread.sleep(100);
 
                         File file = new File(Server.SERVER_TEMP_FILES_DIRECTORY + "/" + fileName);
                         if (file.exists() && file.isFile()) {

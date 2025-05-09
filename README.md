@@ -13,3 +13,4 @@ Este projeto é uma implementação simples de um chat via **Sockets em Java**, 
    - `/file <destinatário> <caminho do arquivo>` – Envia um arquivo para o destinatário.
    - `/users` – Lista todos os usuários conectados.
    - `/sair` – Encerra a conexão do cliente com o servidor.
+5. No diretório do projeto há o arquivo **logs.txt** que salva o IP, data e hora que os usuários conectaram e desconectaram do servidor.
