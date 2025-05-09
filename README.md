@@ -2,6 +2,12 @@
 
 Este projeto é uma implementação simples de um chat via **Sockets em Java**, com suporte ao envio de **mensagens** e **arquivos** entre os usuários.
 
+## Alunos:
+- André Eduardo Schmitz
+- Ana Beatriz Martins da Silva
+- Eduarda Stipp Rech
+- Mariana Rossdeutscher Waltrick Lima
+
 ## Como executar
 
 1. Execute a classe `Main.java`.
